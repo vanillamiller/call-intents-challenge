@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  pAppName:
+    Type: String
+    Description: Application Name deployed in this stack
+    Default: call-intent
+  pEnvironmentName:
+    Type: String
+    Default: dev
+    Description: The name of the specific stack deployment e.g. 'dev'
+
+Resources:
+  IngestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+  
+  IngestSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group Ingestion Process
+      GroupName: !Sub ${pAppName}-${pEnviromentName}-ingestions-sg
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  IngestLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Function: !Sub ${pAppName}-${pEnviromentName}-ingest-lambda
+      Events:
+        S3Event:
+          Type: S3Event
+          Properties:
+            Bucket: !Ref IngestBucket
+            Events:
+              - 's3:ObjectCreated:*'
+
+  S3LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt IngestLambda.Arn
+      Principal: s3.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn: !GetAtt IngestBucket.Arn
