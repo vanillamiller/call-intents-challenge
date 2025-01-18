@@ -43,7 +43,7 @@ if [ -z "${AWS_ACCOUNT_ID}" ]; then
   exit 1
 fi
 
-export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-app
+export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-db
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
 # Create S3 Bucket to store code
 echo "Creating S3 Bucket..."
@@ -52,38 +52,46 @@ aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}" 2>/dev/null ||
 
 checkIfFailed
 
+export KEY_NAME=DbKeyPair
+EXISTING_KEY=$(aws ec2 describe-key-pairs --key-names "$KEY_NAME" --query 'KeyPairs[0].KeyName' --output text 2>/dev/null)
+if [ "$EXISTING_KEY" == "$KEY_NAME" ]; then
+  echo "Key pair '$KEY_NAME' already exists."
+else
+  echo "Key pair '$KEY_NAME' does not exist. Creating a new key pair..."
+$(aws ec2 create-key-pair \
+  --key-name ${KEY_NAME} \
+  --query 'KeyName' \
+  --region ${AWS_REGION} \
+  --output text)
+fi
+
+checkIfFailed
+
+echo keyname ${KEY_NAME}
 echo "SAM: Packaging ${APP_NAME}.yml..."
 sam package \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
     --s3-prefix ${APP_NAME}-app \
-    --template-file cfn/cloudfront.yml \
-    --output-template-file cfn/cloudfront-packaged.yml \
+    --template-file cfn/instance.yml \
+    --output-template-file cfn/instance-packaged.yml \
     --region ${AWS_REGION}
 checkIfFailed
 
 echo "SAM: Deploying ${APP_NAME}.yml..."
-sam deploy --template-file cfn/cloudfront-packaged.yml \
+sam deploy --template-file cfn/instance-packaged.yml \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
-    --s3-prefix ${APP_NAME}-app \
+    --s3-prefix ${APP_NAME}-db \
     --stack-name ${STACK_NAME} \
     --capabilities CAPABILITY_NAMED_IAM \
     --region ${AWS_REGION} \
-    --no-fail-on-empty-changeset
+    --no-fail-on-empty-changeset \
+    --parameter-overrides \
+        ParameterKey=pAppName=${APP_NAME} \
+        ParameterKey=pEnvironmentName=${ENVIRONMENT_NAME} \
+        ParameterKey=pInstanceType=t3.micro \
+        ParameterKey=pKeyName=${KEY_NAME}
+
 checkIfFailed
-
-getStackOutputs ${STACK_NAME}
-pnpm install
-pnpm run build
-
-echo "Cleaning S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 rm s3://${Stack_AppCodeBucketName} --recursive
-checkIfFailed
-
-echo "Uploading to S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 cp dist s3://${Stack_AppCodeBucketName}/ --recursive
-checkIfFailed
-
-aws cloudfront create-invalidation --distribution-id ${Stack_CloudFrontId} --paths "/*" >/dev/null 2>&1
 
 END_TIME=$(date -R)
 

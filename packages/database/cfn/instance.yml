@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  pKeyName:
+    Type: String
+    Default: DbKeyPair
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance.
+
+  pInstanceType:
+    Type: String
+    Default: t4g.micro
+    Description: Instance type for the EC2 instance.
+
+  pDBPassword:
+    NoEcho: true
+    Type: String
+    Default: password
+    Description: Password for the database.
+
+  pDBUsername:
+    NoEcho: true
+    Type: String
+    Default: admin
+    Description: Username for the database.
+
+Resources:
+  PostgresSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable PostgreSQL and SSH access.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+
+  PostgresInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref pInstanceType
+      KeyName: !Ref pKeyName
+      SecurityGroups:
+        - !Ref PostgresSecurityGroup
+      ImageId: ami-07dcf0342633acca6
+      UserData:
+        Fn::Base64: !Sub |
+          sudo yum update -y
+          sudo amazon-linux-extras enable docker
+          sudo yum install -y docker
+          sudo systemctl start docker
+          sudo usermod -aG docker ec2-user
+          sudo docker pull postgres:latest
+          sudo docker run --name call-intent-postgres -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=password -e POSTGRES_DB=call_intents -e POSTGRES_HOST_AUTH_METHOD=md5 -p 5432:5432 -d postgres -c listen_addresses='*'
+
+Outputs:
+  InstanceId:
+    Description: Instance ID of the PostgreSQL server.
+    Value: !Ref PostgresInstance
+
+  PublicIP:
+    Description: Public IP address of the PostgreSQL server.
+    Value: !GetAtt PostgresInstance.PublicIp
+
+  PostgresEndpoint:
+    Description: PostgreSQL connection endpoint.
+    Value: !Join
+      - ':'
+      - - !GetAtt PostgresInstance.PublicIp
+        - '5432'
