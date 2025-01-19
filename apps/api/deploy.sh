@@ -5,13 +5,13 @@ export AWS_REGION=ap-southeast-2
 export APP_NAME=call-intents
 export ENVIRONMENT_NAME=dev
 
-loadDotEnv(){
-  while read -r line; do
-    [[ $line =~ ^#.*$ ]] && continue
-    [[ -z "$line" ]] && continue
-
-    export "$line"
-  done < .env
+load_env() {
+  if [ -f "$1" ]; then
+    export $(grep -v '^#' "$1" | xargs)
+  else
+    echo "Error: .env file not found at $1"
+    return 1
+  fi
 }
 
 checkIfFailed() {
@@ -45,6 +45,8 @@ setOutput() {
     echo "${1}: ${2}"
 }
 
+load_env .env
+
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
 if [ -z "${AWS_ACCOUNT_ID}" ]; then
@@ -56,7 +58,7 @@ export APP_STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-app
 export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-api
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
 
-loadDotEnv
+echo DATABASE_URL ${DATABASE_URL}
 
 # Create S3 Bucket to store code
 echo "Creating S3 Bucket..."
@@ -67,6 +69,7 @@ checkIfFailed
 
 getStackOutputs ${APP_STACK_NAME}
 CLOUDFRONT_DOMAIN=$(aws cloudfront get-distribution --id ${Stack_CloudFrontId} --query 'Distribution.DomainName' --output text)
+echo "CLOUDFRONT_DOMAIN: ${CLOUDFRONT_DOMAIN}"
 
 echo "SAM: Packaging ${APP_NAME}.yml..."
 sam package \

@@ -27,6 +27,11 @@ Parameters:
 Globals:
  Function:
     Runtime: nodejs22.x
+    Handler: index.handler
+    Architectures:
+      - arm64
+    Layers:
+      - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:prisma-layer:${pPrismaLayerVersion}
     Environment:
       Variables:
         DATABASE_URL: !Ref pDatabaseUrl
@@ -40,16 +45,17 @@ Resources:
       CorsConfiguration:
         AllowMethods: ['GET', 'OPTIONS']
         AllowHeaders: ['*']
-        AllowOrigins: !Sub ["https://${pCorsOrigin}"]
+        AllowOrigins: 
+          - !Sub "https://${pCorsOrigin}"
         MaxAge: 300
-      ProtocolVersion: HTTP2
-      SecurityPolicy: TLS_1_2
+      StageName: !Ref pEnvironmentName
 
   GetCategoriesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/lambda/categories/get
+      CodeUri: ../dist/lambda/categories/get
       Runtime: nodejs22.x
+      Role: !GetAtt BasicLambdaRole.Arn
       Events:
         GetCategories:
           Type: HttpApi
@@ -61,8 +67,9 @@ Resources:
   GetCategoryByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/lambda/categories/get-by-id
+      CodeUri: ../dist/lambda/categories/get-by-id
       Runtime: nodejs22.x
+      Role: !GetAtt BasicLambdaRole.Arn
       Events:
         GetCategoryById:
           Type: HttpApi
@@ -70,6 +77,22 @@ Resources:
             ApiId: !Ref CategoriesApi
             Path: /categories/{id}
             Method: GET
+
+  BasicLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${pAppName}-${pEnvironmentName}-basic-lambda-role
+      Description: Ingest Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
 Outputs:
   ApiUrl:

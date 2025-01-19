@@ -55,7 +55,7 @@ Resources:
           sudo systemctl start docker
           sudo usermod -aG docker ec2-user
           sudo docker pull postgres:latest
-          sudo docker run --name call-intent-postgres -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=password -e POSTGRES_DB=call_intents -e POSTGRES_HOST_AUTH_METHOD=md5 -p 5432:5432 -d postgres -c listen_addresses='*'
+          sudo docker run --name call-intent-postgres -e POSTGRES_USER=${pDBUsername} -e POSTGRES_PASSWORD=${pDBPassword} -e POSTGRES_DB=call_intents -e POSTGRES_HOST_AUTH_METHOD=md5 -p 5432:5432 -d postgres -c listen_addresses='*'
 
 Outputs:
   InstanceId:
