@@ -1,0 +1,16 @@
+{
+  "name": "prisma-layer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js",
+    "deploy": "chmod +x deploy.sh && sh deploy.sh"
+  },
+  "dependencies": {
+    "@amiller/prisma": "workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

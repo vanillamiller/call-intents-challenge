@@ -1,18 +1,8 @@
 import { S3Event, Context } from "aws-lambda";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
-import { PrismaClient } from "@amiller/prisma"
-// Helper function to convert a readable stream to a string
-const streamToString = (stream: Readable): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const chunks: Uint8Array[] = [];
-        stream.on("data", (chunk) => chunks.push(chunk));
-        stream.on("error", reject);
-        stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
-    });
+import prisma from "../../lib/prisma";
 
 const s3Client = new S3Client({});
-const prisma = new PrismaClient();
 
 export const handler = async (event: S3Event, context: Context): Promise<void> => {
     // console.log("Received S3 Event:", JSON.stringify(event, null, 2));
@@ -32,13 +22,10 @@ export const handler = async (event: S3Event, context: Context): Promise<void> =
             });
 
             const response = await s3Client.send(command);
+            const content = await response.Body?.transformToString();
+            console.log(content);
 
-            if (response.Body instanceof Readable) {
-                const content = await streamToString(response.Body);
-                console.log(`Object Content: ${content.slice(0, 100)}...`);
-            } else {
-                console.log("Response body is not a readable stream.");
-            }
+
         } catch (error) {
             console.error(`Failed to retrieve object ${objectKey} from bucket ${bucketName}:`, error);
         }
