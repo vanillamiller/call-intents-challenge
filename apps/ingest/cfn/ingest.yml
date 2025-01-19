@@ -49,12 +49,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub ${pAppName}-${pEnvironmentName}-ingest-lambda
-      CodeUri: ../dist/lambdas/ingest
+      CodeUri: ../dist/lambda/ingest
       Timeout: 900
       MemorySize: 256
       Runtime: nodejs22.x
       Handler: index.handler
       Role: !GetAtt IngestLambdaRole.Arn
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:prisma-layer:3
       Architectures:
         - arm64
       Events:

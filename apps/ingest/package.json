@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node esbuild.config.js"
+    "build": "node esbuild.config.js",
+    "deploy": "chmod +x deploy.sh && sh deploy.sh",
+    "lint": "eslint \"src/**/*.{ts,tsx}\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
+    "@types/lodash": "^4.17.14",
+    "@types/stopword": "^2.0.3",
     "esbuild": "^0.24.2",
     "typescript": "^5.7.3"
   },
@@ -19,6 +23,10 @@
     "@aws-sdk/client-s3": "^3.731.1",
     "aws-lambda": "^1.0.7",
     "fastify": "^5.2.1",
-    "openai": "^4.79.1"
+    "lodash": "^4.17.21",
+    "nanoid": "^5.0.9",
+    "openai": "^4.79.1",
+    "stopword": "^3.1.4",
+    "zod": "^3.24.1"
   }
 }

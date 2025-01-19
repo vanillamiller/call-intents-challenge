@@ -5,6 +5,15 @@ export AWS_REGION=ap-southeast-2
 export APP_NAME=call-intents
 export ENVIRONMENT_NAME=dev
 
+loadDotEnv(){
+  while read -r line; do
+    [[ $line =~ ^#.*$ ]] && continue
+    [[ -z "$line" ]] && continue
+
+    export "$line"
+  done < .env
+}
+
 checkIfFailed() {
   latestReturnCode=$?
   if [ $latestReturnCode -ne 0 ]; then
@@ -43,13 +52,14 @@ if [ -z "${AWS_ACCOUNT_ID}" ]; then
   exit 1
 fi
 
-export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-ingest
-export CODE_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${ACCOUNT_ID}-code"
+export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-api
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
+
+loadDotEnv
 
 # Create S3 Bucket to store code
 echo "Creating S3 Bucket..."
-aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}" 2>/dev/null ||
+aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}"  2>&1 >/dev/null ||
     aws s3 mb s3://${DEPLOYMENT_BUCKET_NAME}
 
 checkIfFailed
@@ -57,20 +67,24 @@ checkIfFailed
 echo "SAM: Packaging ${APP_NAME}.yml..."
 sam package \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
-    --s3-prefix ${APP_NAME}-ingest \
-    --template-file cfn/ingest.yml \
-    --output-template-file cfn/ingest-packaged.yml \
+    --s3-prefix ${APP_NAME}-api \
+    --template-file cfn/api.yml \
+    --output-template-file cfn/api-packaged.yml \
     --region ${AWS_REGION}
 checkIfFailed
 
 echo "SAM: Deploying ${APP_NAME}.yml..."
-sam deploy --template-file cfn/ingest-packaged.yml \
+sam deploy --template-file cfn/api-packaged.yml \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
-    --s3-prefix ${APP_NAME}-ingest \
+    --s3-prefix ${APP_NAME}-api \
     --stack-name ${STACK_NAME} \
     --capabilities CAPABILITY_NAMED_IAM \
     --region ${AWS_REGION} \
     --no-fail-on-empty-changeset \
+    --parameter-overrides \
+      ParameterKey=pCorsOrigin,ParameterValue=${ENVIRONMENT_NAME} \
+      ParameterKey=pPrismaLayerVersion,ParameterValue=${PRISMA_LAYER_VERSION} \
+      ParameterKey=pDatabaseUrl,ParameterValue=${} \
 
 checkIfFailed
 
