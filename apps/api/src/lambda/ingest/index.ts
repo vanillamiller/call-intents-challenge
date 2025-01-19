@@ -14,7 +14,7 @@ const streamToString = (stream: Readable): Promise<string> =>
 const s3Client = new S3Client({});
 const prisma = new PrismaClient();
 
-export const handler = async (): Promise<void> => {
+export const handler = async (event: S3Event, context: Context): Promise<void> => {
     // console.log("Received S3 Event:", JSON.stringify(event, null, 2));
     const results = await prisma.intentCategory.count();
     console.log("Results:", results);
@@ -44,5 +44,3 @@ export const handler = async (): Promise<void> => {
         }
     }
 };
-
-handler();

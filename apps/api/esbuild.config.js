@@ -17,6 +17,7 @@ async function build() {
       target: 'node18',
       outfile: 'dist/index.js',
       format: 'cjs',
+      sourceRoot: "src",
       external: [
         '@aws-sdk/*',
         '@amiller/prisma'
