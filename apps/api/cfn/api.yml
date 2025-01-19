@@ -55,9 +55,8 @@ Resources:
       Runtime: nodejs22.x
       Handler: index.handler
       Role: !GetAtt IngestLambdaRole.Arn
-      # Environment:
-      #   Variables:
-      #     BUCKET_NAME: !Ref IngestBucket
+      Architectures:
+        - arm64
       Events:
         S3Event:
           Type: S3

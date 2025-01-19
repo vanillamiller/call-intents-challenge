@@ -44,7 +44,9 @@ if [ -z "${AWS_ACCOUNT_ID}" ]; then
 fi
 
 export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-ingest
+export CODE_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${ACCOUNT_ID}-code"
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
+
 # Create S3 Bucket to store code
 echo "Creating S3 Bucket..."
 aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}" 2>/dev/null ||
@@ -71,20 +73,6 @@ sam deploy --template-file cfn/ingest-packaged.yml \
     --no-fail-on-empty-changeset \
 
 checkIfFailed
-
-getStackOutputs ${STACK_NAME}
-pnpm install
-pnpm run build
-
-echo "Cleaning S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 rm s3://${Stack_AppCodeBucketName} --recursive
-checkIfFailed
-
-echo "Uploading to S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 cp dist s3://${Stack_AppCodeBucketName}/ --recursive
-checkIfFailed
-
-aws cloudfront create-invalidation --distribution-id ${Stack_CloudFrontId} --paths "/*" >/dev/null 2>&1
 
 END_TIME=$(date -R)
 

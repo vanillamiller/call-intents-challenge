@@ -5,8 +5,13 @@
   "main": "./node_modules/.prisma/client/index.js",
   "types": "./node_modules/.prisma/client/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "pnpm run generate",
+    "generate": "pnpm prisma generate",
+    "migrate": "pnpm prisma migrate dev --name init "
   },
+  "files": [
+    "node_modules/.prisma/client"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
