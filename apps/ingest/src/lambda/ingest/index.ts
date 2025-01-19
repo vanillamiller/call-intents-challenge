@@ -39,8 +39,8 @@ class CompletionParamFactory<T> {
             temperature: this.temperature,
             responseFormat: this.responseFormat,
             prompts: [
-                { role: "system" as const, content: this.systemPrompt },
-                { role: "user" as const, content: prompts}
+                { role: "system", content: this.systemPrompt },
+                ...prompts.map((prompt) => ({ role: "user" as const, content: prompt }))
             ]
         }
     }
@@ -50,8 +50,6 @@ export const handler = async (event: S3Event): Promise<void> => {
     for (const record of event.Records) {
         const bucketName = record.s3.bucket.name;
         const objectKey = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
-
-        console.log(`Bucket: ${bucketName}, Key: ${objectKey}`);
 
         try {
             const command = new GetObjectCommand({
@@ -69,15 +67,12 @@ export const handler = async (event: S3Event): Promise<void> => {
                 model: "gpt-4o-mini",
                 temperature: 0.01,
                 systemPrompt: FIRST_PASS_FEW_SHOT,
-                responseFormat: OBJECT_RESPONSE_FORMAT()
+                responseFormat: OBJECT_RESPONSE_FORMAT
             });
 
             const firstPassPrompts = chunk(parsedIntents, 20).map((prompts) => firstPassPromptFactory.create(prompts))
             const inference = new Inference(firstPassPrompts);
             const completions = await inference.completeTaskConcurrent();
-
-            console.log(`COMPLETIONS`, completions);
-            console.log(`COMPLETIONS MAP`, inference.completed);
 
         } catch (error) {
             console.error(`Failed to retrieve object ${objectKey} from bucket ${bucketName}:`, error);

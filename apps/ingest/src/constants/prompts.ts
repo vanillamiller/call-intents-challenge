@@ -13,7 +13,7 @@ const rawIntentsExample: Record<string, string> = {
     "4J6gFI8anMPEJYWWcCYHE": "Trigger the onboarding process for a brand-new handset or internet service"
 }
 
-for(const [key, val] of Object.entries(rawIntentsExample)) {
+for (const [key, val] of Object.entries(rawIntentsExample)) {
     rawIntentsExample[key] = removeStopWordsString(val)
 }
 
@@ -67,17 +67,24 @@ You MUST assign it to one of the following categories: ${categories.join(", ")}.
 It MUST be the most applicable and relevent category of that intent.
 `)
 
-export const OBJECT_RESPONSE_FORMAT = (ids: string[]) => ({
+// export const OBJECT_RESPONSE_FORMAT = (ids: string[]) => ({
+//     format: z.object({
+//         objectResponse: z.object(
+//             ids.reduce((acc, id) => {
+//                 acc[id] = z.string(); // Dynamically add each id as a required string field
+//                 return acc;
+//             }, {} as Record<string, z.ZodString>)
+//         ),
+//     }),
+//     name: "object_response"
+// });
+
+export const OBJECT_RESPONSE_FORMAT = {
     format: z.object({
-        objectResponse: z.object(
-            ids.reduce((acc, id) => {
-                acc[id] = z.string(); // Dynamically add each id as a required string field
-                return acc;
-            }, {} as Record<string, z.ZodString>)
-        ),
+        objectResponse: z.record(z.string(), z.string()),
     }),
     name: "object_response"
-});
+};
 
 export const LIST_RESPONSE_FORMAT = {
     format: z.object({

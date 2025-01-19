@@ -36,7 +36,6 @@ class Inference {
                         throw new Error(`Failed to complete task ${key}`);
                     }
                     this.completedCompletions[key] = { completion, success: true, prompts: val.prompts };
-                    console.log("COMPLETION", completion);
                     return completion;
                 } catch (error) {
                     if(!(--retries)){
