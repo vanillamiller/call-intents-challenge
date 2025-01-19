@@ -5,6 +5,15 @@ export AWS_REGION=ap-southeast-2
 export APP_NAME=call-intents
 export ENVIRONMENT_NAME=dev
 
+load_env() {
+  if [ -f "$1" ]; then
+    export $(grep -v '^#' "$1" | xargs)
+  else
+    echo "Error: .env file not found at $1"
+    return 1
+  fi
+}
+
 checkIfFailed() {
   latestReturnCode=$?
   if [ $latestReturnCode -ne 0 ]; then
@@ -36,6 +45,7 @@ setOutput() {
     echo "${1}: ${2}"
 }
 
+load_env .env
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
 if [ -z "${AWS_ACCOUNT_ID}" ]; then
@@ -89,7 +99,9 @@ sam deploy --template-file cfn/instance-packaged.yml \
         ParameterKey=pAppName=${APP_NAME} \
         ParameterKey=pEnvironmentName=${ENVIRONMENT_NAME} \
         ParameterKey=pInstanceType=t3.micro \
-        ParameterKey=pKeyName=${KEY_NAME}
+        ParameterKey=pKeyName=${KEY_NAME} \
+        ParameterKey=pDBPassword=${DB_PASSWORD} \
+        ParameterKey=pDBUsername=${DB_USERNAME} 
 
 checkIfFailed
 
