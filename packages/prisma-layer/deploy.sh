@@ -12,6 +12,7 @@ checkIfFailed() {
     exit 255
   fi
 }
+
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 checkIfFailed
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"

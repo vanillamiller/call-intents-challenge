@@ -12,6 +12,7 @@ class Inference {
 
     public async complete({ temperature, model, responseFormat, prompts }: CompletionParams) {
         try {
+            console.log("PROMPTS", prompts);
             const completion = await this.openai.chat.completions.create({
                 model,
                 temperature,
@@ -20,6 +21,7 @@ class Inference {
             });
             return completion.choices[0].message.content;
         } catch (error) {
+            console.log("ERROR Inference.complete", error)
             throw error;
         }
     }
@@ -27,17 +29,19 @@ class Inference {
     public async completeTaskConcurrent() {
         const completions = await Promise.allSettled(Object.entries(this.requestedCompletions).map(async ([key, val]) => {
             let retries = 5;
-            while(!this.completedCompletions[key]?.success && retries){
+            while (!this.completedCompletions[key]?.success && retries) {
                 try {
                     const completion = await this.complete(val);
-                    if(!completion){
+                    if (!completion) {
                         throw new Error(`Failed to complete task ${key}`);
                     }
-                    this.completedCompletions[key] = { completion, success: true };
+                    this.completedCompletions[key] = { completion, success: true, prompts: val.prompts };
                     console.log("COMPLETION", completion);
                     return completion;
                 } catch (error) {
-                    --retries;
+                    if(!(--retries)){
+                        throw error;
+                    };
                 }
             }
         }));

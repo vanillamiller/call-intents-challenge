@@ -16,6 +16,7 @@ export interface CompletionParams {
 };
 
 export interface CompletedCompletion {
+    prompts: PromptList;
     completion: string;
     success: boolean;
 }

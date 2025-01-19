@@ -52,6 +52,7 @@ if [ -z "${AWS_ACCOUNT_ID}" ]; then
   exit 1
 fi
 
+export APP_STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-app
 export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-api
 export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
 
@@ -63,6 +64,9 @@ aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}"  2>&1 >/dev/null ||
     aws s3 mb s3://${DEPLOYMENT_BUCKET_NAME}
 
 checkIfFailed
+
+getStackOutputs ${APP_STACK_NAME}
+CLOUDFRONT_DOMAIN=$(aws cloudfront get-distribution --id ${Stack_CloudFrontId} --query 'Distribution.DomainName' --output text)
 
 echo "SAM: Packaging ${APP_NAME}.yml..."
 sam package \
@@ -84,7 +88,9 @@ sam deploy --template-file cfn/api-packaged.yml \
     --parameter-overrides \
       ParameterKey=pCorsOrigin,ParameterValue=${ENVIRONMENT_NAME} \
       ParameterKey=pPrismaLayerVersion,ParameterValue=${PRISMA_LAYER_VERSION} \
-      ParameterKey=pDatabaseUrl,ParameterValue=${} \
+      ParameterKey=pDatabaseUrl,ParameterValue=${DATABASE_URL} \
+      ParameterKey=pCorsOrigin,ParameterValue=${CLOUDFRONT_DOMAIN}
+
 
 checkIfFailed
 

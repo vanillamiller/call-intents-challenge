@@ -40,7 +40,7 @@ Resources:
       CorsConfiguration:
         AllowMethods: ['GET', 'OPTIONS']
         AllowHeaders: ['*']
-        AllowOrigins: ['*']
+        AllowOrigins: !Sub ["https://${pCorsOrigin}"]
         MaxAge: 300
       ProtocolVersion: HTTP2
       SecurityPolicy: TLS_1_2
