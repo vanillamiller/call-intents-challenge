@@ -14,9 +14,12 @@ export interface CompletionParams {
     responseFormat?: ReturnType<typeof zodResponseFormat>
     prompts: PromptList;
 };
-
+export type CompletionParamsList = CompletionParams[];
 export interface CompletedCompletion {
     prompts: PromptList;
     completion: string;
     success: boolean;
 }
+
+export type PromptsCompletionMap = Record<string, CompletedCompletion>
+

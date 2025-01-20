@@ -7,10 +7,11 @@ const rawIntentsExample: Record<string, string> = {
     "W7U8kksHA20GZYGq85r-H": "Demand a copy of previous invoices",
     "-qoOfxPUjg3pwi5DLZn9U": "Solve a technical mystery",
     "DjPt_WbyCqTDkM48P3v-y": "Implore a temporary service interruption",
-    "99Si7yFBZdwPiYOsXuMAm": "Ache for a temporary service stoppage",
-    "u_rN4ESGIZqp7F7hpuDqo": "Invigorate a service stoppage",
+    "99Si7yFBZdwPiYOsXuMAm": "Uncover the early termination fee implications",
+    "u_rN4ESGIZqp7F7hpuDqo": "Spark the inquiry into acquiring a modern phone or internet offering",
     "7yBBxpE640NWUG50mv_lE": "Gather information on the data utilization and surcharge",
-    "4J6gFI8anMPEJYWWcCYHE": "Trigger the onboarding process for a brand-new handset or internet service"
+    "4J6gFI8anMPEJYWWcCYHE": "Trigger the onboarding process for a brand-new handset or internet service",
+    "BuuWJ5eGmIB1gIqqFVizR": "Mobilize international data usageMobilize international data usage"
 }
 
 for (const [key, val] of Object.entries(rawIntentsExample)) {
@@ -23,15 +24,16 @@ const simplifiedIntentsExample = {
     "W7U8kksHA20GZYGq85r-H": "Billing",
     "-qoOfxPUjg3pwi5DLZn9U": "Technical Support",
     "DjPt_WbyCqTDkM48P3v-y": "Service Termination",
-    "99Si7yFBZdwPiYOsXuMAm": "Service Termination",
-    "u_rN4ESGIZqp7F7hpuDqo": "Service Termination",
+    "99Si7yFBZdwPiYOsXuMAm": "Fees",
+    "u_rN4ESGIZqp7F7hpuDqo": "Sales",
     "7yBBxpE640NWUG50mv_lE": "Usage",
-    "4J6gFI8anMPEJYWWcCYHE": "Service Connection"
+    "4J6gFI8anMPEJYWWcCYHE": "Service Connection",
+    "BuuWJ5eGmIB1gIqqFVizR": "Data Roaming"
 };
 
 export const FIRST_PASS_FEW_SHOT = `
 Categorize caller intents coming from a helpline to a Telecommunications company.
-Categories relate to customer experience.
+Categories relate to customer experience in the telecommunications industry.
 Do not use words "Enquiry" or "Inquiry" in the categories.
 Do not use plurals in your answer.
 Use 2 words maximum, prefer one word but only if it is a noun.
@@ -60,31 +62,15 @@ The category "Serice Failure" was removed in favor of "Service Disruption" becau
 terminology. The category "Theft Report" was removed because "Theft" conveys just as much meaning.
 `
 
-export const THIRD_PASS_FEW_SHOT = (categories: string[]) => (`
+export const THIRD_PASS_CLASSIFY = (categories: string[]) => (`
 You are tasked with mapping customer intents from a customer experience helpline you will receive a json indexed by id containing intents to categorize.
 You must map its matching category to its id and return the json.
 You MUST assign it to one of the following categories: ${categories.join(", ")}.
 It MUST be the most applicable and relevent category of that intent.
+Return JSON in plain text, do not format with markdown!
+Do not insert newlines.
+Categorize intents with undecidable categories as "Unknown" not ''.
 `)
-
-// export const OBJECT_RESPONSE_FORMAT = (ids: string[]) => ({
-//     format: z.object({
-//         objectResponse: z.object(
-//             ids.reduce((acc, id) => {
-//                 acc[id] = z.string(); // Dynamically add each id as a required string field
-//                 return acc;
-//             }, {} as Record<string, z.ZodString>)
-//         ),
-//     }),
-//     name: "object_response"
-// });
-
-export const OBJECT_RESPONSE_FORMAT = {
-    format: z.object({
-        objectResponse: z.record(z.string(), z.string()),
-    }),
-    name: "object_response"
-};
 
 export const LIST_RESPONSE_FORMAT = {
     format: z.object({

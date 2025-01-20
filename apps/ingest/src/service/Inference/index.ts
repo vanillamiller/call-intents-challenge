@@ -1,16 +1,16 @@
-import openai from "../lib/openai";
-import { CompletedCompletion, CompletionParams } from "../types";
+import openai from "../../lib/openai";
+import { CompletedCompletion, CompletionParams, PromptsCompletionMap } from "../../types";
 
 class Inference {
     private openai = openai;
     private requestedCompletions: Record<string, CompletionParams> = {};
-    private completedCompletions: Record<string, CompletedCompletion> = {};
+    private completedCompletions: PromptsCompletionMap = {};
 
     constructor(rCompletions: CompletionParams[]) {
         this.requestedCompletions = rCompletions.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {})
     }
 
-    public async complete({ temperature, model, responseFormat, prompts }: CompletionParams) {
+    private complete = async ({ temperature, model, responseFormat, prompts }: CompletionParams) => {
         try {
             console.log("PROMPTS", prompts);
             const completion = await this.openai.chat.completions.create({
@@ -26,8 +26,8 @@ class Inference {
         }
     }
 
-    public async completeTaskConcurrent() {
-        const completions = await Promise.allSettled(Object.entries(this.requestedCompletions).map(async ([key, val]) => {
+    public completeConcurrent = async () => {
+        await Promise.allSettled(Object.entries(this.requestedCompletions).map(async ([key, val]) => {
             let retries = 5;
             while (!this.completedCompletions[key]?.success && retries) {
                 try {
@@ -44,7 +44,7 @@ class Inference {
                 }
             }
         }));
-        return completions;
+        return this.completedCompletions;
     }
 
     get completed() {
