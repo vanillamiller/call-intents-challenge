@@ -11,19 +11,21 @@ const useIntents = () => {
         queryFn: getCategories
     });
 
-    const { data: intents, isLoading: isLoadingIntents, isError: isErrorIntents } = useQuery({
+    const { refetch: fetchIntents, data: intents, isLoading: isLoadingIntents, isError: isErrorIntents } = useQuery({
         queryKey: ['intents', currentCategoryId],
-        queryFn: () => getCategoryIntents(currentCategoryId)
+        queryFn: () => getCategoryIntents(currentCategoryId),
+        enabled: false
     });
-    
+
     return {
         categories,
         isLoadingCategories,
         isErrorCategories,
         intents,
         isLoadingIntents,
-        isErrorIntents
+        isErrorIntents,
+        fetchIntents
     }
 }
 
-export default useIntents
+export default useIntents;
