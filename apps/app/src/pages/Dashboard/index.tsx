@@ -7,17 +7,18 @@ import { useMemo } from "react";
 
 const Dashboard = () => {
 
-  const { categories, isLoadingCategories, isErrorCategories } = useIntents();
+  const { categories, isLoadingCategories, isErrorCategories, setCurrentCategoryId } = useIntents();
   const orderedCategories = useMemo(() => {
     return categories?.sort((a, b) => b.intentCount - a.intentCount) ?? [];
   }, [categories]);
 
   return (
     <Box sx={{ backgroundColor: "black", minHeight: '100vh', padding: 0, margin: 0 }}>
-      {categories && <Grid container spacing={2}>
-        <Grid size={7}>
-          <VerticalPercentBarChart data={orderedCategories} />
+      {categories && <Grid container spacing={2} height={"100%"}>
+        <Grid container size={7}>
+            <VerticalPercentBarChart data={orderedCategories} handleBarClick={setCurrentCategoryId} />
         </Grid>
+        <Grid container></Grid>
       </Grid>}
       {isErrorCategories && <Alert variant="filled" severity="error">Error loading Categories.</Alert>}
       {isLoadingCategories && <CircularProgress />}

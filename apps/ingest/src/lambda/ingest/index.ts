@@ -26,7 +26,6 @@ export const handler = async (event: S3Event): Promise<void> => {
                 throw new Error("No results");
             }
 
-            console.log("Results:", results);
             if (intents.length === results.length) {
                 const structured = Array.from(
                     results.reduce((map, item) => {

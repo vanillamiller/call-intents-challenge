@@ -17,7 +17,7 @@ export const getCategories = async () => {
   }
 }
 
-export const getCategoryIntents = async (categoryId: number) => {
+export const getCategoryIntents = async (categoryId?: number) => {
   try {
     const { data } = await intentsClient.get(`categories/${categoryId}`);
     return data;

@@ -1,8 +1,8 @@
-import {create} from "zustand"
+import { createWithEqualityFn as create } from 'zustand/traditional'
 
 interface CurrentCategoryState {
-    currentCategoryId: number
-    setCurrentCategoryId: (categoryId: number) => void
+    currentCategoryId?: number;
+    setCurrentCategoryId: (categoryId: number) => void;
 }
 
 export const useCurrentCategoryStore = create<CurrentCategoryState>((set) => ({

@@ -5,16 +5,18 @@ import { useCurrentCategoryStore } from "../store";
 
 const useIntents = () => {
 
-    const { currentCategoryId } = useCurrentCategoryStore();
+    const currentCategoryId = useCurrentCategoryStore((state) => state.currentCategoryId);
+    const setCurrentCategoryId = useCurrentCategoryStore((state) => state.setCurrentCategoryId);
+
     const { data: categories, isLoading: isLoadingCategories, isError: isErrorCategories } = useQuery<Category[]>({
         queryKey: ['categories'],
         queryFn: getCategories
     });
 
-    const { refetch: fetchIntents, data: intents, isLoading: isLoadingIntents, isError: isErrorIntents } = useQuery({
+    const { data: intents, isLoading: isLoadingIntents, isError: isErrorIntents } = useQuery({
         queryKey: ['intents', currentCategoryId],
         queryFn: () => getCategoryIntents(currentCategoryId),
-        enabled: false
+        enabled: !!currentCategoryId
     });
 
     return {
@@ -24,7 +26,7 @@ const useIntents = () => {
         intents,
         isLoadingIntents,
         isErrorIntents,
-        fetchIntents
+        setCurrentCategoryId
     }
 }
 

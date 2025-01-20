@@ -1,5 +1,7 @@
 export interface Intent {
-
+    id: number;
+    name: string;
+    date: string;
 }
 
 export interface Category {
