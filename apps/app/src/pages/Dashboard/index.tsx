@@ -15,7 +15,6 @@ const Dashboard = () => {
   return (
     <Box sx={{ backgroundColor: "black", minHeight: '100vh', padding: 0, margin: 0 }}>
       {categories && <Grid container spacing={2}>
-        <Grid size={12} />
         <Grid size={7}>
           <VerticalPercentBarChart data={orderedCategories} />
         </Grid>
