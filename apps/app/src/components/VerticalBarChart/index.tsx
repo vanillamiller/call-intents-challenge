@@ -7,7 +7,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 type Props = {
   data: Category[];
-  handleBarClick: (id: number) => void;
+  handleBarClick: (id: Category) => void;
 }
 
 const VerticalBarChart = ({ data, handleBarClick }: Props) => {
@@ -42,7 +42,7 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
     onClick: (_, elements) => {
       if (elements.length > 0) {
         const index = elements[0].index;
-        handleBarClick(data[index].id);
+        handleBarClick(data[index]);
       }
     },
     plugins: {
@@ -53,14 +53,6 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
           font: {
             size: 14
           }
-        }
-      },
-      title: {
-        display: true,
-        text: 'Category Intent Distribution (%)',
-        color: '#fff',
-        font: {
-          size: 20
         }
       },
       tooltip: {

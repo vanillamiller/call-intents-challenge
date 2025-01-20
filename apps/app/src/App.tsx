@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Dashboard from './pages/Dashboard';
+import Box from '@mui/material/Box';
 
 const queryClient = new QueryClient();
 
@@ -7,7 +8,9 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Dashboard />
+      <Box sx={{ backgroundColor: "black", minHeight: '100vh', padding: 0, margin: 0 }}>
+        <Dashboard />
+      </Box>
     </QueryClientProvider>
   )
 }

@@ -1,30 +1,31 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import { Alert, Box, Grid2 as Grid } from "@mui/material";
+import { Alert, Grid2 as Grid } from "@mui/material";
 import useIntents from "../../hooks/useIntents";
 import VerticalPercentBarChart from "../../components/VerticalBarChart";
 import { useMemo } from "react";
+import IntentsTable from "../../components/Table";
 
 
 const Dashboard = () => {
 
-  const { categories, isLoadingCategories, isErrorCategories, setCurrentCategoryId } = useIntents();
+  const { categories, isLoadingCategories, isErrorCategories, setCurrentCategory, intents, isLoadingIntents } = useIntents();
   const orderedCategories = useMemo(() => {
     return categories?.sort((a, b) => b.intentCount - a.intentCount) ?? [];
   }, [categories]);
 
-  return (
-    <Box sx={{ backgroundColor: "black", minHeight: '100vh', padding: 0, margin: 0 }}>
-      {categories && <Grid container spacing={2} height={"100%"}>
-        <Grid container size={7}>
-            <VerticalPercentBarChart data={orderedCategories} handleBarClick={setCurrentCategoryId} />
-        </Grid>
-        <Grid container></Grid>
-      </Grid>}
-      {isErrorCategories && <Alert variant="filled" severity="error">Error loading Categories.</Alert>}
-      {isLoadingCategories && <CircularProgress />}
-      {!categories?.length && !isLoadingCategories && !isErrorCategories && <Alert variant="filled" severity="warning">No Categories found.</Alert>}
-    </Box>
-  )
+  if (categories) return (<Grid spacing={2}>
+    <Grid container size={{ xs: 7 }}>
+      <VerticalPercentBarChart data={orderedCategories} handleBarClick={setCurrentCategory} />
+    </Grid>
+    <Grid container size={{ xs: 5 }}>
+      {intents && !isLoadingIntents && <IntentsTable intents={intents} />}
+      {isLoadingIntents && <CircularProgress />}
+    </Grid>
+  </Grid>)
+
+  if(isErrorCategories) return <Alert variant="filled" severity="error">Error loading Categories.</Alert>
+  if(isLoadingCategories) return  <CircularProgress />
+  if(!isLoadingCategories && !isErrorCategories) return <Alert variant="filled" severity="warning">No Categories found.</Alert>
 };
 
 export default Dashboard;
