@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  pAppName:
+    Type: String
+    Description: Application Name deployed in this stack
+    Default: call-intent
+
+  pEnvironmentName:
+    Type: String
+    Default: dev
+    Description: The name of the specific stack deployment e.g. 'dev'
+
+  pCorsOrigin:
+    Type: String
+    Description: The CORS origin for the API
+
+  pPrismaLayerVersion:
+    Type: String
+    Description: The version of the Prisma Layer to use
+
+  pDatabaseUrl:
+    Type: String
+    Description: The Database URL for the API to connect to.
+
+Globals:
+ Function:
+    Runtime: nodejs22.x
+    Handler: index.handler
+    Architectures:
+      - arm64
+    Layers:
+      - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:prisma-layer:${pPrismaLayerVersion}
+    Environment:
+      Variables:
+        DATABASE_URL: !Ref pDatabaseUrl
+    MemorySize: 256
+    Timeout: 30
+
+Resources:
+  CategoriesApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowMethods: ['GET', 'OPTIONS']
+        AllowHeaders: ['*']
+        AllowOrigins: 
+          - !Sub "https://${pCorsOrigin}"
+        MaxAge: 300
+      StageName: !Ref pEnvironmentName
+
+  GetCategoriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../dist/lambda/categories/get
+      Runtime: nodejs22.x
+      Role: !GetAtt BasicLambdaRole.Arn
+      Events:
+        GetCategories:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref CategoriesApi
+            Path: /categories
+            Method: GET
+
+  GetCategoryByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../dist/lambda/categories/get-by-id
+      Runtime: nodejs22.x
+      Role: !GetAtt BasicLambdaRole.Arn
+      Events:
+        GetCategoryById:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref CategoriesApi
+            Path: /categories/{id}
+            Method: GET
+
+  BasicLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${pAppName}-${pEnvironmentName}-basic-lambda-role
+      Description: Ingest Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+
+Outputs:
+  ApiUrl:
+    Description: URL of your API
+    Value: !Sub 'https://${CategoriesApi}.execute-api.${AWS::Region}.amazonaws.com'

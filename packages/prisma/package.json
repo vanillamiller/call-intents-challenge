@@ -1,0 +1,24 @@
+{
+  "name": "@amiller/prisma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./node_modules/.prisma/client/index.js",
+  "types": "./node_modules/.prisma/client/index.d.ts",
+  "scripts": {
+    "prepare": "pnpm run generate",
+    "generate": "pnpm prisma generate",
+    "migrate": "pnpm prisma migrate dev --name init "
+  },
+  "files": [
+    "node_modules/.prisma/client"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^6.2.1"
+  },
+  "dependencies": {
+    "@prisma/client": "6.2.1"
+  }
+}

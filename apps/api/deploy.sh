@@ -5,6 +5,15 @@ export AWS_REGION=ap-southeast-2
 export APP_NAME=call-intents
 export ENVIRONMENT_NAME=dev
 
+load_env() {
+  if [ -f "$1" ]; then
+    export $(grep -v '^#' "$1" | xargs)
+  else
+    echo "Error: .env file not found at $1"
+    return 1
+  fi
+}
+
 checkIfFailed() {
   latestReturnCode=$?
   if [ $latestReturnCode -ne 0 ]; then
@@ -36,6 +45,8 @@ setOutput() {
     echo "${1}: ${2}"
 }
 
+load_env .env
+
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
 if [ -z "${AWS_ACCOUNT_ID}" ]; then
@@ -43,47 +54,48 @@ if [ -z "${AWS_ACCOUNT_ID}" ]; then
   exit 1
 fi
 
-export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-app
-export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-app-${AWS_ACCOUNT_ID}-deployment"
+export APP_STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-app
+export STACK_NAME=${APP_NAME}-${ENVIRONMENT_NAME}-api
+export DEPLOYMENT_BUCKET_NAME="${APP_NAME}-${ENVIRONMENT_NAME}-${AWS_ACCOUNT_ID}-deployment"
+
+echo DATABASE_URL ${DATABASE_URL}
+
 # Create S3 Bucket to store code
 echo "Creating S3 Bucket..."
-aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}" 2>/dev/null ||
+aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET_NAME}"  2>&1 >/dev/null ||
     aws s3 mb s3://${DEPLOYMENT_BUCKET_NAME}
 
 checkIfFailed
 
+getStackOutputs ${APP_STACK_NAME}
+CLOUDFRONT_DOMAIN=$(aws cloudfront get-distribution --id ${Stack_CloudFrontId} --query 'Distribution.DomainName' --output text)
+echo "CLOUDFRONT_DOMAIN: ${CLOUDFRONT_DOMAIN}"
+
 echo "SAM: Packaging ${APP_NAME}.yml..."
 sam package \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
-    --s3-prefix ${APP_NAME}-app \
-    --template-file cfn/cloudfront.yml \
-    --output-template-file cfn/cloudfront-packaged.yml \
+    --s3-prefix ${APP_NAME}-api \
+    --template-file cfn/api.yml \
+    --output-template-file cfn/api-packaged.yml \
     --region ${AWS_REGION}
 checkIfFailed
 
 echo "SAM: Deploying ${APP_NAME}.yml..."
-sam deploy --template-file cfn/cloudfront-packaged.yml \
+sam deploy --template-file cfn/api-packaged.yml \
     --s3-bucket ${DEPLOYMENT_BUCKET_NAME} \
-    --s3-prefix ${APP_NAME}-app \
+    --s3-prefix ${APP_NAME}-api \
     --stack-name ${STACK_NAME} \
     --capabilities CAPABILITY_NAMED_IAM \
     --region ${AWS_REGION} \
-    --no-fail-on-empty-changeset
+    --no-fail-on-empty-changeset \
+    --parameter-overrides \
+      ParameterKey=pCorsOrigin,ParameterValue=${ENVIRONMENT_NAME} \
+      ParameterKey=pPrismaLayerVersion,ParameterValue=${PRISMA_LAYER_VERSION} \
+      ParameterKey=pDatabaseUrl,ParameterValue=${DATABASE_URL} \
+      ParameterKey=pCorsOrigin,ParameterValue=${CLOUDFRONT_DOMAIN}
+
+
 checkIfFailed
-
-getStackOutputs ${STACK_NAME}
-pnpm install
-pnpm run build
-
-echo "Cleaning S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 rm s3://${Stack_AppCodeBucketName} --recursive
-checkIfFailed
-
-echo "Uploading to S3 bucket ${Stack_AppCodeBucketName}...."
-aws s3 cp dist s3://${Stack_AppCodeBucketName}/ --recursive
-checkIfFailed
-
-aws cloudfront create-invalidation --distribution-id ${Stack_CloudFrontId} --paths "/*" >/dev/null 2>&1
 
 END_TIME=$(date -R)
 

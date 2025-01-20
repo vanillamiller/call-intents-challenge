@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  pAppName:
+    Type: String
+    Description: Application Name deployed in this stack
+    Default: call-intent
+  pEnvironmentName:
+    Type: String
+    Default: dev
+    Description: The name of the specific stack deployment e.g. 'dev'
+  pVpcId:
+    Type: String
+    Default: vpc-0149b4c0d5ffcc424
+
+Resources:
+  IngestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+  
+  IngestSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group Ingestion Process
+      GroupName: !Sub ${pAppName}-${pEnvironmentName}-ingestions-sg
+      VpcId: !Ref pVpcId
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  IngestLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${pAppName}-${pEnvironmentName}-ingest-lambda
+      CodeUri: ../dist/lambda/ingest
+      Timeout: 900
+      MemorySize: 256
+      Runtime: nodejs22.x
+      Handler: index.handler
+      Role: !GetAtt IngestLambdaRole.Arn
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:prisma-layer:3
+      Architectures:
+        - arm64
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref IngestBucket
+            Events:
+              - 's3:ObjectCreated:*'
+
+  IngestLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${pAppName}-${pEnvironmentName}-ingest-lambda-role
+      Description: Ingest Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      Policies:
+        - PolicyName: "LambdaS3ExecutionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                Resource:
+                  - !Sub arn:aws:s3:::${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}/*
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutBucketNotification"
+                Resource:
+                   - !Sub arn:aws:s3:::${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+
+  S3LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt IngestLambda.Arn
+      Principal: s3.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn: !Sub arn:aws:s3:::${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}
