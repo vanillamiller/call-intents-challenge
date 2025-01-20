@@ -47,6 +47,7 @@ Resources:
         AllowHeaders: ['*']
         AllowOrigins: 
           - !Sub "https://${pCorsOrigin}"
+          - !Sub "http://localhost:5173"
         MaxAge: 300
       StageName: !Ref pEnvironmentName
 
