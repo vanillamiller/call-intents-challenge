@@ -1,46 +1,71 @@
-import { 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableHead, 
-    TableRow, 
-    Paper 
-  } from '@mui/material';
-  import { Intent } from '../../types/intent';
-  
-  type Props = {
-    intents: Intent[]
-  }
-  
-  const IntentsTable = ({ intents }: Props) => {
-    return (
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Intent</TableCell>
-              <TableCell align="right">Timestamp</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {intents.map((intent, index) => (
-              <TableRow
-                key={index}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {intent.name}
-                </TableCell>
-                <TableCell align="right">
-                  {new Date(intent.date).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
-  
-  export default IntentsTable;
+import {
+  Box,
+  Typography
+} from '@mui/material';
+import { Intent, IntentsApiResponse } from '../../types/intent';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+
+
+type Props = {
+  intentResponse: IntentsApiResponse;
+  isLoadingIntents: boolean;
+  isErrorIntents: boolean;
+}
+
+const columns: GridColDef<Intent>[] = [
+  { field: "intent", headerName: "Intent", flex: 2 },
+  { field: "date", headerName: "Time", flex: 1 },
+]
+
+const IntentsTable = ({ intentResponse, isLoadingIntents, isErrorIntents }: Props) => {
+  const { intents, name } = intentResponse;
+
+  return (
+    <Box sx={{
+      display: 'flex',  // Add this
+      flexDirection: 'column',  // Add this
+    }}>
+      <Typography variant='h4' color='#3C9A9A'>{name}</Typography>
+      <DataGrid rows={intents} columns={columns} disableRowSelectionOnClick
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
+        }}
+        pageSizeOptions={[5]}
+        sx={{
+          color: "white",
+          "& .MuiDataGrid-cell": {
+            color: "white"
+          },
+          "& .MuiDataGrid-columnHeader": {
+            color: "white",
+            backgroundColor: "black"  // Add this line
+          },
+          "& .MuiDataGrid-columnHeaders": {  // Add this block
+            backgroundColor: "black"
+          },
+          "& .MuiDataGrid-footerContainer": {
+            color: "white"
+          },
+          // Add these styles for pagination
+          "& .MuiTablePagination-root": {
+            color: "white"
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white"
+          },
+          "& .MuiTablePagination-actions": {
+            color: "white"
+          },
+          "& .MuiButtonBase-root": {
+            color: "white"
+          }
+        }} />
+    </Box>
+  );
+};
+
+export default IntentsTable;
