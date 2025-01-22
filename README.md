@@ -5,7 +5,7 @@ A project designed to demonstrate the handling of call intents. The system compr
 ---
 
 ## Demo
-[Call Intents Dashboard](call-intents-demo.mov)
+[![Demo Video]](s3://call-intents-challenge-demo/Screen Recording 2025-01-22 at 7.14.02 pm.mov)
 
 
 ## Table of Contents
