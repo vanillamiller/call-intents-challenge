@@ -134,4 +134,6 @@ dist
 
 *.turbo
 
-.vite/
+*.vite/
+
+*.DS_STORE

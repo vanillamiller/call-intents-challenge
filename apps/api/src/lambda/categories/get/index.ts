@@ -1,28 +1,13 @@
 // src/lambda/categories/get/index.ts
 import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
-import { PrismaClient } from '@amiller/prisma'
-
-const prisma = new PrismaClient()
+import { getAllCategories } from '../../../intents-client'
 
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyStructuredResultV2> => {
   try {
-    const categories = await prisma.intentCategory.findMany({
-      include: {
-        _count: {
-          select: { 
-            intents: true 
-          }
-        }
-      }
-    })
-
-    const categoriesWithCount = categories.map(category => ({
-      id: category.id,
-      name: category.name,
-      intentCount: category._count.intents
-    }))
+    
+    const categoriesWithCount = await getAllCategories();
 
     return {
       statusCode: 200,
@@ -31,6 +16,7 @@ export const handler = async (
       },
       body: JSON.stringify(categoriesWithCount)
     }
+    
   } catch (error) {
     console.error('Error fetching categories:', error)
     return {
