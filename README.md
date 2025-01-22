@@ -4,9 +4,14 @@ A project designed to demonstrate the handling of call intents. The system compr
 
 ---
 
+## Demo
+[Call Intents Dashboard](call-intents-dashboard-demo.mov)
+
+
 ## Table of Contents
 
 - [Call Intents Challenge](#call-intents-challenge)
+  - [Demo](#demo)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [These were then sent to the db.](#these-were-then-sent-to-the-db)
@@ -20,6 +25,7 @@ A project designed to demonstrate the handling of call intents. The system compr
     - [Database](#database)
     - [Prisma](#prisma)
   - [Installation](#installation)
+  - [Limitations](#limitations)
 
 ---
 
@@ -179,7 +185,7 @@ The project is organized into the following apps and packages:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-org/call-intents-challenge.git
+   git clone https://github.com/vanillamiller/call-intents-challenge.git
    cd call-intents-challenge
    ```
 
@@ -192,3 +198,13 @@ The project is organized into the following apps and packages:
    - Copy the `.env.example` file to `.env` in each app/package and configure it as needed.
 
 ---
+
+## Limitations
+The application was built as an MVP and has the following limitations.
+- No authentication or authorization
+- No automated testing
+- Minimal LLM output validation
+- No turbo monorepo pipeline for infra deployment
+- Limited AWS security
+- No github actions/workflows
+- No global theme
