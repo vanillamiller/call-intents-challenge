@@ -38,7 +38,7 @@ The intents have stop words removed in order to improve performance and token us
 
 There are 3 steps to the categorization process.
 1. A few shot approach was used in the initial labelling of the data, where a small sample of the file was used as an example mapping the human labelled data to the intent in a json object.
-```
+```plaintext
 Categorize caller intents coming from a helpline to a Telecommunications company.
 Categories relate to customer experience in the telecommunications industry.
 Do not use words "Enquiry" or "Inquiry" in the categories.
@@ -54,7 +54,7 @@ PROMPT: {"QrQ3_xyGiys9TGyVxFsO-":"Ignite international data roaming","8URUqNJt3K
 COMPLETION: {"QrQ3_xyGiys9TGyVxFsO-":"Activation","8URUqNJt3KK4qMGbB4fHd":"Repair","W7U8kksHA20GZYGq85r-H":"Billing","-qoOfxPUjg3pwi5DLZn9U":"Technical Support","DjPt_WbyCqTDkM48P3v-y":"Service Termination","99Si7yFBZdwPiYOsXuMAm":"Fees","u_rN4ESGIZqp7F7hpuDqo":"Sales","7yBBxpE640NWUG50mv_lE":"Usage","4J6gFI8anMPEJYWWcCYHE":"Service Connection","BuuWJ5eGmIB1gIqqFVizR":"Data Roaming"}
 ```
 2. This response is then used to feed back into the LLM which is asked to simplify the rough call intent categories provided by the first step.
-```
+```plaintext
 You are tasked with simplifying customer experience categories in the Telecommunications sector.
   You will be given an array of categories in which you will group similar categories to simpler ones, and remove ones
   that .
@@ -67,7 +67,7 @@ You are tasked with simplifying customer experience categories in the Telecommun
   terminology. The category "Theft Report" was removed because "Theft" conveys just as much meaning.
 ```
 3. The list output from the second step is used as labels in which the LLM must apply to the call intents as its category.
-```
+```plaintext
 You are tasked with mapping customer intents from a customer experience helpline you will receive a json indexed by id containing intents to categorize.
 You must map its matching category to its id and return the json.
 You MUST assign it to one of the following categories: ${categories.join(", ")}.
