@@ -1,6 +1,6 @@
 # Call Intents Challenge
 
-A project designed to demonstrate the handling of call intents. The system comprises several applications and supporting packages to manage data ingestion, API services, and database interactions.
+A project designed to demonstrate the handling the categorization of call intents. The system comprises several applications and supporting packages to manage data ingestion, API services, and database interactions.
 
 ---
 
@@ -42,6 +42,8 @@ The **Call Intents Challenge** is a modular project designed to:
 The architecture follows a multi-app and package-based approach for modularity and scalability.
 
 The call_intent files namely `call_intents_challenge.txt` is uploaded to an S3 bucket (${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}) which invokes a lambda listening for the `s3:ObjectCreated:*` event.
+
+There were no labels provided and as such the chosen approach was to have the LLM make its own category labels based on the provided intents.
 
 The intents have stop words removed in order to improve performance and token usage.
 
