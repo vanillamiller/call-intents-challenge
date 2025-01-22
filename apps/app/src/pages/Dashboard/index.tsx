@@ -1,5 +1,5 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import { Alert, Box, Grid2 } from "@mui/material";
+import { Alert, Box, Grid2, Typography } from "@mui/material";
 import VerticalPercentBarChart from "../../components/VerticalBarChart";
 import useCategories from "../../hooks/useCatategories";
 import IntentsTable from "../../components/Table";
@@ -27,22 +27,12 @@ const Dashboard = () => {
               borderColor: "#3C9A9A",
               borderWidth: 2,
               height: "600px",
-              overflowY: "auto",
-              "&::-webkit-scrollbar": {
-                width: "4px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "transparent",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "rgba(75, 192, 192, 0.8)",
-                borderRadius: "4px",
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                background: "rgba(75, 192, 192, 1)",
-              },
+              overflow: "hidden"
             }}
           >
+            <Typography variant="h4" color="#3C9A9A" marginBottom={4}>
+              Intent Categories
+            </Typography>
             <VerticalPercentBarChart
               data={orderedCategories}
               handleBarClick={id => setCurrentCategoryId(id)}

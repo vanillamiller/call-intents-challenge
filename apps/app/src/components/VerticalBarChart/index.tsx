@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Category } from "../../types/intent";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useMemo } from "react";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -105,9 +105,23 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
   return (
     <Box
       sx={{
-        height: "100%",
+        height: "90%",
         width: "100%",
         padding: 1,
+        overflowY: "auto",
+        "&::-webkit-scrollbar": {
+          width: "4px",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "rgba(75, 192, 192, 0.8)",
+          borderRadius: "4px",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          background: "rgba(75, 192, 192, 1)",
+        },
       }}
     >
       <div
@@ -117,9 +131,6 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
           height: "100%",
         }}
       >
-        <Typography variant="h4" color="#3C9A9A" marginBottom={4}>
-          Intent Categories
-        </Typography>
         <Bar data={chartData} options={options} />
       </div>
     </Box>
