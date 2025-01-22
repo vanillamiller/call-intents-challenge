@@ -15,7 +15,7 @@ function App() {
           margin: 0,
         }}
       >
-        <h1 style={{ color: "white" }}>Call Intents Challenge</h1>
+        <h1 style={{ color: "white" }}>Call Intents Dashboard</h1>
         <Dashboard />
       </Box>
     </QueryClientProvider>
