@@ -5,7 +5,7 @@ A project designed to demonstrate the handling of call intents. The system compr
 ---
 
 ## Demo
-[Call Intents Dashboard](call-intents-dashboard-demo.mov)
+[Call Intents Dashboard](call-intents-demo.mov)
 
 
 ## Table of Contents
