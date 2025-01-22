@@ -83,7 +83,7 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
             display: false,
           },
           max: 100,
-          position: "bottom", // Force position to bottom
+          position: "bottom",
         },
         y: {
           grid: {

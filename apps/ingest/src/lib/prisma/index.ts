@@ -13,11 +13,9 @@ export const deleteAllData = async () => {
   try {
     console.log("Deleting all data...");
 
-    // Delete data in child table first
     await prisma.intent.deleteMany();
     console.log("All intents deleted.");
 
-    // Then delete data in the parent table
     await prisma.intentCategory.deleteMany();
     console.log("All intent categories deleted.");
 
