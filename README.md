@@ -7,7 +7,9 @@ A project designed to demonstrate the handling the categorization of call intent
 ## Demo
 [Call Intents Challenge](https://d3chm4buyxjmy7.cloudfront.net/)
 ## Watch the Demo Video
-https://github.com/user-attachments/assets/b1ba00f6-622d-4821-87de-ce7ec2c3d3b9
+https://github.com/user-attachments/assets/47ae5027-2b74-42b5-ba73-49c76d4a52af
+
+
 
 
 
