@@ -10,9 +10,6 @@ Parameters:
     Type: String
     Default: dev
     Description: The name of the specific stack deployment e.g. 'dev'
-  pVpcId:
-    Type: String
-    Default: vpc-0149b4c0d5ffcc424
 
 Resources:
   IngestBucket:
@@ -34,16 +31,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: "AES256"
-  
-  IngestSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security Group Ingestion Process
-      GroupName: !Sub ${pAppName}-${pEnvironmentName}-ingestions-sg
-      VpcId: !Ref pVpcId
-      SecurityGroupEgress:
-        - IpProtocol: -1
-          CidrIp: 0.0.0.0/0
 
   IngestLambda:
     Type: AWS::Serverless::Function

@@ -5,13 +5,14 @@ A project designed to demonstrate the handling of call intents. The system compr
 ---
 
 ## Demo
-[![Demo Video]](s3://call-intents-challenge-demo/Screen Recording 2025-01-22 at 7.14.02 pm.mov)
-
+[Call Intents Challenge](https://d3chm4buyxjmy7.cloudfront.net/)
+## Watch the Demo Video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vfFJH__ANYc" frameborder="0" allowfullscreen></iframe>
 
 ## Table of Contents
-
 - [Call Intents Challenge](#call-intents-challenge)
   - [Demo](#demo)
+  - [Watch the Demo Video](#watch-the-demo-video)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [These were then sent to the db.](#these-were-then-sent-to-the-db)
@@ -38,7 +39,7 @@ The **Call Intents Challenge** is a modular project designed to:
 
 The architecture follows a multi-app and package-based approach for modularity and scalability.
 
-The call_intent files namely `call_intents_challenge.txt` is uploaded to an S3 bucket which invokes a lambda listening for the `Object:Created` event.
+The call_intent files namely `call_intents_challenge.txt` is uploaded to an S3 bucket (${pAppName}-${pEnvironmentName}-ingest-bucket-${AWS::AccountId}) which invokes a lambda listening for the `s3:ObjectCreated:*` event.
 
 The intents have stop words removed in order to improve performance and token usage.
 
