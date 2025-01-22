@@ -215,3 +215,4 @@ The application was built as an MVP and has the following limitations.
 - Limited AWS security
 - No github actions/workflows
 - No global theme
+- No responsive design
