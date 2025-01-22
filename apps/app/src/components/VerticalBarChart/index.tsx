@@ -7,11 +7,11 @@ import {
   Tooltip,
   Legend,
   ChartOptions,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { Category } from '../../types/intent';
-import { Box, Typography } from '@mui/material';
-import { useMemo } from 'react';
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import { Category } from "../../types/intent";
+import { Box, Typography } from "@mui/material";
+import { useMemo } from "react";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -33,20 +33,20 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       labels: percentages.map(item => item.name),
       datasets: [
         {
-          label: 'Intent Percentage',
+          label: "Intent Percentage",
           data: percentages.map(item => parseFloat(item.percentage)),
-          backgroundColor: 'rgba(75, 192, 192, 0.8)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: "rgba(75, 192, 192, 0.8)",
+          borderColor: "rgba(75, 192, 192, 1)",
           borderWidth: 1,
           borderRadius: 5,
-          hoverBackgroundColor: 'rgba(75, 192, 192, 1)',
+          hoverBackgroundColor: "rgba(75, 192, 192, 1)",
           barThickness: 20,
         },
       ],
     };
 
-    const options: ChartOptions<'bar'> = {
-      indexAxis: 'y',
+    const options: ChartOptions<"bar"> = {
+      indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
       onClick: (_, elements) => {
@@ -57,12 +57,12 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       },
       plugins: {
         legend: {
-          display: false
+          display: false,
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
           padding: 12,
           cornerRadius: 8,
           displayColors: false,
@@ -77,20 +77,20 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       scales: {
         x: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: "rgba(255, 255, 255, 0.1)",
           },
           ticks: {
-            display: false
+            display: false,
           },
           max: 100,
-          position: 'bottom',  // Force position to bottom
+          position: "bottom", // Force position to bottom
         },
         y: {
           grid: {
             display: false,
           },
           ticks: {
-            color: '#fff',
+            color: "#fff",
             font: {
               size: 12,
             },
@@ -99,26 +99,27 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       },
     };
 
-    return { totalIntents, percentages, chartData, options }
-  }, [data, handleBarClick])
-
+    return { totalIntents, percentages, chartData, options };
+  }, [data, handleBarClick]);
 
   return (
     <Box
       sx={{
-        height: '100%',
-        width: '100%',
+        height: "100%",
+        width: "100%",
         padding: 1,
       }}
     >
       <div
         style={{
           minHeight: `${data.length * 30}px`,
-          width: '100%',
-          height: '100%',
+          width: "100%",
+          height: "100%",
         }}
       >
-        <Typography variant='h4' color='#3C9A9A' marginBottom={4}>Intent Categories</Typography>
+        <Typography variant="h4" color="#3C9A9A" marginBottom={4}>
+          Intent Categories
+        </Typography>
         <Bar data={chartData} options={options} />
       </div>
     </Box>

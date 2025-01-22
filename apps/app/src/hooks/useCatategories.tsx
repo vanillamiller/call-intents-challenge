@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { Category } from '../types/intent';
-import { getCategoryIntents, getCategories } from '../client';
-import { useCurrentCategoryStore } from '../store';
-import { useMemo } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { Category } from "../types/intent";
+import { getCategoryIntents, getCategories } from "../client";
+import { useCurrentCategoryStore } from "../store";
+import { useMemo } from "react";
 
 const useCategories = () => {
   const currentCategoryId = useCurrentCategoryStore(
@@ -16,7 +16,7 @@ const useCategories = () => {
     isLoading: isLoadingCategories,
     isError: isErrorCategories,
   } = useQuery<Category[]>({
-    queryKey: ['categories'],
+    queryKey: ["categories"],
     queryFn: getCategories,
   });
 
@@ -25,13 +25,13 @@ const useCategories = () => {
     setCurrentCategoryId(ordered[0]?.id);
     return ordered;
   }, [categories]);
-  
+
   const {
     data: intents,
     isLoading: isLoadingIntents,
     isError: isErrorIntents,
   } = useQuery({
-    queryKey: ['intents', currentCategoryId],
+    queryKey: ["intents", currentCategoryId],
     queryFn: () => getCategoryIntents(currentCategoryId),
     enabled: !!currentCategoryId,
   });
@@ -44,7 +44,7 @@ const useCategories = () => {
     isLoadingIntents,
     isErrorIntents,
     setCurrentCategoryId,
-    currentCategoryId
+    currentCategoryId,
   };
 };
 

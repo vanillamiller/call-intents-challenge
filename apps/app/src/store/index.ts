@@ -1,4 +1,4 @@
-import { createWithEqualityFn as create } from 'zustand/traditional';
+import { createWithEqualityFn as create } from "zustand/traditional";
 
 interface CurrentCategoryState {
   currentCategoryId?: number;
@@ -7,5 +7,5 @@ interface CurrentCategoryState {
 
 export const useCurrentCategoryStore = create<CurrentCategoryState>()(set => ({
   currentCategoryId: undefined,
-  setCurrentCategoryId: (id: number) => set({ currentCategoryId: id })
+  setCurrentCategoryId: (id: number) => set({ currentCategoryId: id }),
 }));
