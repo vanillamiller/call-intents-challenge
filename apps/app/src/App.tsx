@@ -12,11 +12,12 @@ function App() {
         sx={{
           backgroundColor: 'black',
           minHeight: '100vh',
-          padding: 8,
+          padding: 1,
           margin: 0,
         }}
       >
-          <Dashboard />
+        <h1 style={{ color: 'white' }}>Call Intents Challenge</h1>
+        <Dashboard />
       </Box>
     </QueryClientProvider>
   );

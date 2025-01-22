@@ -1,12 +1,11 @@
 import { createWithEqualityFn as create } from 'zustand/traditional';
-import { Category } from '../types/intent';
 
 interface CurrentCategoryState {
-  currentCategory?: Category;
-  setCurrentCategory: (category: Category) => void; // Fixed function name in interface
+  currentCategoryId?: number;
+  setCurrentCategoryId: (id: number) => void;
 }
 
 export const useCurrentCategoryStore = create<CurrentCategoryState>()(set => ({
-  currentCategory: undefined, // Match the interface
-  setCurrentCategory: (category: Category) => set({ currentCategory: category }), // Simplified set
+  currentCategoryId: undefined,
+  setCurrentCategoryId: (id: number) => set({ currentCategoryId: id })
 }));

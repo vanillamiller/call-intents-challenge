@@ -1,9 +1,11 @@
 import {
   Box,
+  CircularProgress,
   Typography
 } from '@mui/material';
 import { Intent, IntentsApiResponse } from '../../types/intent';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { useMemo } from 'react';
 
 
 type Props = {
@@ -18,15 +20,19 @@ const columns: GridColDef<Intent>[] = [
 ]
 
 const IntentsTable = ({ intentResponse, isLoadingIntents, isErrorIntents }: Props) => {
-  const { intents, name } = intentResponse;
+  const { intents, name } = useMemo(() => {
+    const { intents, name } = intentResponse;
+    return { intents, name }
+  }, [intentResponse]);
 
   return (
     <Box sx={{
-      display: 'flex',  // Add this
-      flexDirection: 'column',  // Add this
+      display: 'flex',
+      flexDirection: 'column',
+      padding: 1,
     }}>
-      <Typography variant='h4' color='#3C9A9A'>{name}</Typography>
-      <DataGrid rows={intents} columns={columns} disableRowSelectionOnClick
+      <Typography variant='h4' color='#3C9A9A' marginBottom={4}>{name}</Typography>
+      {!isLoadingIntents && !isErrorIntents && <DataGrid rows={intents} columns={columns} disableRowSelectionOnClick
         initialState={{
           pagination: {
             paginationModel: {
@@ -42,15 +48,14 @@ const IntentsTable = ({ intentResponse, isLoadingIntents, isErrorIntents }: Prop
           },
           "& .MuiDataGrid-columnHeader": {
             color: "white",
-            backgroundColor: "black"  // Add this line
+            backgroundColor: "black"
           },
-          "& .MuiDataGrid-columnHeaders": {  // Add this block
+          "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "black"
           },
           "& .MuiDataGrid-footerContainer": {
             color: "white"
           },
-          // Add these styles for pagination
           "& .MuiTablePagination-root": {
             color: "white"
           },
@@ -63,7 +68,8 @@ const IntentsTable = ({ intentResponse, isLoadingIntents, isErrorIntents }: Prop
           "& .MuiButtonBase-root": {
             color: "white"
           }
-        }} />
+        }} />}
+        {isLoadingIntents && <CircularProgress />}
     </Box>
   );
 };

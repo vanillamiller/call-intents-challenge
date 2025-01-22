@@ -1,26 +1,23 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import { Alert, Box, Grid2 } from '@mui/material';
 import VerticalPercentBarChart from '../../components/VerticalBarChart';
-import { useMemo } from 'react';
 import useCategories from '../../hooks/useCatategories';
 import IntentsTable from '../../components/Table';
 
 const Dashboard = () => {
   const {
-    categories,
+    orderedCategories,
     isLoadingCategories,
     isErrorCategories,
-    setCurrentCategory,
+    setCurrentCategoryId,
     intents,
     isErrorIntents,
     isLoadingIntents
   } = useCategories();
 
-  const orderedCategories = useMemo(() => {
-    return categories?.sort((a, b) => b.intentCount - a.intentCount) ?? [];
-  }, [categories]);
+  
 
-  if (categories)
+  if (orderedCategories)
     return (
       <Grid2 container spacing={4} sx={{ height: "100%" }}>
         <Grid2 size={6}>
@@ -46,7 +43,7 @@ const Dashboard = () => {
               background: 'rgba(75, 192, 192, 1)',
             },
           }}>
-            <VerticalPercentBarChart data={orderedCategories} handleBarClick={setCurrentCategory} />
+            <VerticalPercentBarChart data={orderedCategories} handleBarClick={(id) => setCurrentCategoryId(id)} />
           </Box>
         </Grid2>
         <Grid2 size={6}>

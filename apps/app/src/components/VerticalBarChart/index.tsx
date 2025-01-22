@@ -10,14 +10,14 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { Category } from '../../types/intent';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 type Props = {
   data: Category[];
-  handleBarClick: (id: Category) => void;
+  handleBarClick: (id: number) => void;
 };
 
 const VerticalBarChart = ({ data, handleBarClick }: Props) => {
@@ -52,7 +52,7 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       onClick: (_, elements) => {
         if (elements.length > 0) {
           const index = elements[0].index;
-          handleBarClick(data[index]);
+          handleBarClick(data[index]?.id);
         }
       },
       plugins: {
@@ -99,7 +99,7 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       },
     };
 
-    return { totalIntents, percentages, chartData, options}
+    return { totalIntents, percentages, chartData, options }
   }, [data, handleBarClick])
 
 
@@ -108,7 +108,7 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
       sx={{
         height: '100%',
         width: '100%',
-        padding: '20px',
+        padding: 1,
       }}
     >
       <div
@@ -118,10 +118,11 @@ const VerticalBarChart = ({ data, handleBarClick }: Props) => {
           height: '100%',
         }}
       >
+        <Typography variant='h4' color='#3C9A9A' marginBottom={4}>Intent Categories</Typography>
         <Bar data={chartData} options={options} />
       </div>
     </Box>
-   );
+  );
 };
 
 export default VerticalBarChart;
