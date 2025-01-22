@@ -41,6 +41,7 @@ class TaskStep {
     const result = await this.execute(this.preparedRequests);
     if (this.validate) {
       const isValid = this.validate(result);
+      // eslint-disable-next-line no-empty
       while (!isValid) {}
     }
     this._result = result;

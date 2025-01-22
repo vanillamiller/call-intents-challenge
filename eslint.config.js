@@ -21,7 +21,6 @@ module.exports = [
     rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["error"],
-      "no-console": "warn",
       "quotes": ["error", "double"],
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn"

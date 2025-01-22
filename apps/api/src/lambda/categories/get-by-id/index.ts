@@ -1,4 +1,3 @@
-// src/lambda/categories/get-by-id/index.ts
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { getCategoryById } from "../../../intents-client";
 
@@ -36,6 +35,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       body: JSON.stringify(category),
     };
   } catch (error) {
+    /*eslint- */
     console.error("Error fetching category:", error);
     return {
       statusCode: 500,

@@ -1,5 +1,5 @@
 import openai from "../../lib/openai";
-import { CompletedCompletion, CompletionParams, PromptsCompletionMap } from "../../types";
+import { CompletionParams, PromptsCompletionMap } from "../../types";
 
 class Inference {
   private openai = openai;

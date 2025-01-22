@@ -12,7 +12,7 @@ type Params = {
     name: string;
   };
 };
-class CompletionParamFactory<T> {
+class CompletionParamFactory {
   private model: string;
   private temperature: number;
   private systemPrompt: string;

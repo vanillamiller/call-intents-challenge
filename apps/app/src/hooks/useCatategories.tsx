@@ -24,7 +24,7 @@ const useCategories = () => {
     const ordered = categories?.sort((a, b) => b.intentCount - a.intentCount) ?? [];
     setCurrentCategoryId(ordered[0]?.id);
     return ordered;
-  }, [categories]);
+  }, [categories, setCurrentCategoryId]);
 
   const {
     data: intents,

@@ -1,10 +1,8 @@
 // src/lambda/categories/get/index.ts
-import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
+import { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { getAllCategories } from "../../../intents-client";
 
-export const handler = async (
-  event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyStructuredResultV2> => {
+export const handler = async (): Promise<APIGatewayProxyStructuredResultV2> => {
   try {
     const categoriesWithCount = await getAllCategories();
 

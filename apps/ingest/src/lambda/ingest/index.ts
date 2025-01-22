@@ -1,7 +1,7 @@
 import { S3Event } from "aws-lambda";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import IntentCategorizer from "src/service/IntentCategorizer";
-import { createMultipleCategories, deleteAllData } from "src/lib/prisma";
+import { createMultipleCategories } from "src/lib/prisma";
 
 const s3Client = new S3Client({});
 

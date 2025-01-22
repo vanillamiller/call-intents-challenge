@@ -79,7 +79,7 @@ class IntentCategorizer {
           temperature: 0.01,
           systemPrompt: THIRD_PASS_CLASSIFY(Array.from(secondPassCatSet)),
         });
-        const intentList = Object.entries(this.intentsMap).map(([_, vals]) => vals);
+        const intentList = Object.values(this.intentsMap);
         const chunks = chunk(intentList, CHUNK_SIZE);
         const messages = chunks.map((chunk) =>
           chunk.reduce(
@@ -115,7 +115,7 @@ class IntentCategorizer {
       const parsedIntent = removeStopWordsString(val.intent);
       this.intentsMap[key] = { ...val, parsedIntent, id: key };
     }
-    const intentList = Object.entries(this.intentsMap).map(([_, vals]) => vals);
+    const intentList = Object.values(this.intentsMap);
     const factory = new CompletionParamFactory({
       model: "gpt-4o-mini",
       temperature: 0.01,
